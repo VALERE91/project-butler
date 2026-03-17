@@ -1,53 +1,129 @@
-# Development
+# Project Butler
 
-Your new jumpstart project includes basic organization with an organized `assets` folder and a `components` folder.
-If you chose to develop with the router feature, you will also have a `views` folder.
+A desktop application for organizing and launching your development tools, services, and scripts — all from one place.
 
-```
-project/
-├─ assets/ # Any assets that are used by the app should be placed here
-├─ src/
-│  ├─ main.rs # The entrypoint for the app.
-│  ├─ components/
-│  │  ├─ mod.rs # Defines the components module
-│  │  ├─ hero.rs # The Hero component for use in the home page
-├─ Cargo.toml # The Cargo.toml file defines the dependencies and feature flags for your project
-```
+Built with Rust and [Dioxus](https://dioxuslabs.com/).
 
-### Automatic Tailwind (Dioxus 0.7+)
+---
 
-As of Dioxus 0.7, there no longer is a need to manually install tailwind. Simply `dx serve` and you're good to go!
+## Overview
 
-Automatic tailwind is supported by checking for a file called `tailwind.css` in your app's manifest directory (next to Cargo.toml). To customize the file, use the dioxus.toml:
+Project Butler lets you group related commands and applications into **projects**, then launch them with a single click. Each running process streams its output in real time to a tabbed log panel at the bottom of the screen.
 
-```toml
-[application]
-tailwind_input = "my.css"
-tailwind_output = "assets/out.css"
-```
+It's designed for developers who regularly juggle multiple services, scripts, or tools across different codebases.
 
-### Tailwind Manual Install
+---
 
-To use tailwind plugins or manually customize tailwind, you can can install the Tailwind CLI and use it directly.
+## Features
 
-1. Install npm: https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
-2. Install the Tailwind CSS CLI: https://tailwindcss.com/docs/installation/tailwind-cli
-3. Run the following command in the root of the project to start the Tailwind CSS compiler:
+- **Project organization** — group apps and commands into named projects with custom colors and icons
+- **One-click launch** — run any configured command without opening a terminal
+- **Real-time log output** — stdout and stderr streamed to a tabbed panel, with stderr clearly labeled
+- **Process control** — kill running processes directly from the UI
+- **Environment variables** — configure per-app env vars, working directories, and arguments
+- **Persistent config** — everything is saved to `config.json` automatically
+- **Native file dialogs** — pick executables, working directories, and icon images from your filesystem
+- **Icon support** — use emojis or image files (PNG, SVG, JPG, WebP) as project and app icons
 
-```bash
-npx @tailwindcss/cli -i ./input.css -o ./assets/tailwind.css --watch
-```
+---
 
-### Serving Your App
+## Getting Started
 
-Run the following command in the root of your project to start developing with the default platform:
+### Prerequisites
+
+- [Rust](https://rustup.rs/) (stable)
+- [Dioxus CLI](https://dioxuslabs.com/learn/0.7/getting_started)
 
 ```bash
-dx serve
+cargo install dioxus-cli
 ```
 
-To run for a different platform, use the `--platform platform` flag. E.g.
+### Running
+
 ```bash
 dx serve --platform desktop
 ```
 
+On first launch, a `config.json` will be created in the project root to store your configuration.
+
+---
+
+## Usage
+
+1. **Add a project** — click `+ Add Project` in the sidebar, give it a name, color, and optional icon
+2. **Add apps** — select a project, click `+ Add App`, and configure the command, arguments, working directory, and environment variables
+3. **Launch** — click `Launch` on any app card to run it
+4. **Monitor** — view live output in the log panel at the bottom; switch between processes using the tabs
+5. **Stop** — click `Kill` on any running process tab to terminate it
+
+---
+
+## Configuration
+
+All configuration is stored in `config.json` at the project root:
+
+```json
+{
+  "projects": [
+    {
+      "id": "uuid",
+      "name": "My Project",
+      "description": "Optional description",
+      "color": "#6366f1",
+      "icon": "🚀",
+      "apps": [
+        {
+          "id": "uuid",
+          "name": "Dev Server",
+          "description": "Start the development server",
+          "icon": "⚡",
+          "command": "npm",
+          "args": ["run", "dev"],
+          "env": { "NODE_ENV": "development" },
+          "cwd": "/path/to/project",
+          "confirm": false
+        }
+      ]
+    }
+  ]
+}
+```
+
+The file is updated automatically as you add, edit, or remove projects and apps through the UI. You can also edit it manually.
+
+---
+
+## Project Structure
+
+```
+project-butler/
+├── src/
+│   ├── main.rs              # App entry point and root layout
+│   ├── config.rs            # Config loading and saving
+│   ├── process/
+│   │   └── mod.rs           # Process spawning and output capture
+│   └── components/
+│       ├── sidenav.rs       # Project list sidebar
+│       ├── main_content.rs  # App card grid
+│       ├── log_panel.rs     # Tabbed process output panel
+│       ├── toast.rs         # Notification toasts
+│       └── modal/           # Add/edit forms for projects and apps
+├── assets/
+│   └── tailwind.css         # Compiled Tailwind CSS
+├── config.json              # Your saved projects and apps
+├── Cargo.toml
+└── Dioxus.toml
+```
+
+---
+
+## Tech Stack
+
+| **Component** | **Details**                              |
+|---------------|------------------------------------------|
+| Language      | Rust (Edition 2021)                      |
+| UI Framework  | [Dioxus](https://dioxuslabs.com/) 0.7    |
+| Async Runtime | [Tokio](https://tokio.rs/)               |
+| Styling       | [Tailwind CSS](https://tailwindcss.com/) |
+| Serialization | serde / serde_json                       |
+| File Dialogs  | [rfd](https://github.com/PolyMeilex/rfd) |
